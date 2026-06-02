@@ -5,26 +5,100 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>生日快乐</title>
 <style>
-body{margin:0;padding:0;background:#fdf6f8;font-family:微软雅黑,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;}
-.pop{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:999;}
-.box{background:#fff;padding:30px;border-radius:16px;text-align:center;max-width:320px;width:80%;}
-h1{color:#ff5e87;margin:0 0 10px;}
-.txt{color:#666;font-size:16px;line-height:1.6;}
-.btn{padding:12px 24px;background:#ff5e87;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#fdf6f8;font-family:微软雅黑;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.btn{padding:12px 26px;background:#ff5e87;color:#fff;border:0;border-radius:8px;font-size:17px;cursor:pointer}
+/*3D场景*/
+.cakeBox{width:360px;height:340px;perspective:1200px;display:none}
+.cake3d{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:cakeShow 1s ease-out}
+@keyframes cakeShow{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+.cakeTit{position:absolute;top:-38px;width:100%;text-align:center;font-size:22px;color:#ff5e87;font-weight:bold}
+/*白圆盘底座*/
+.plate{width:330px;height:16px;background:#fff;border-radius:50%;position:absolute;bottom:10px;left:15px;box-shadow:0 4px 8px #ddd}
+/*下层蛋糕*/
+.cakeLow{width:270px;height:92px;background:#fff2d0;border-radius:14px;position:absolute;bottom:22px;left:45px;box-shadow:inset 0 -6px rgba(220,200,150,0.3)}
+/*上层蛋糕*/
+.cakeUp{width:175px;height:75px;background:#fff2d0;border-radius:12px;position:absolute;bottom:110px;left:92px;box-shadow:inset 0 -5px rgba(220,200,150,0.3)}
+/*两层波浪奶油边*/
+.creamWave{position:absolute;height:18px;background:#fff8e8;border-radius:50% 50% 0 0}
+.waveLow{width:270px;bottom:20px;left:45px;background:radial-gradient(circle at bottom,#fff8e8 55%,transparent 56%) repeat-x;background-size:32px 18px}
+.waveUp{width:175px;bottom:108px;left:92px;background:radial-gradient(circle at bottom,#fff8e8 55%,transparent 56%) repeat-x;background-size:26px 18px}
+/*金珠珍珠点缀*/
+.dot{border-radius:50%;position:absolute}
+.gold{background:#ffd700;box-shadow:0 0 4px #ffd700}
+.pearl{background:#fff;box-shadow:0 0 3px #e9e9e9}
+/*下层对称珠子*/
+.g1{width:7px;height:7px;bottom:28px;left:52px}.p1{width:6px;height:6px;bottom:29px;left:78px}
+.g2{width:7px;height:7px;bottom:28px;left:110px}.p2{width:6px;height:6px;bottom:29px;left:135px}
+.g3{width:7px;height:7px;bottom:28px;left:162px}.p3{width:6px;height:6px;bottom:29px;left:190px}
+.g4{width:7px;height:7px;bottom:28px;left:222px}.p4{width:6px;height:6px;bottom:29px;left:246px}
+/*上层对称珠子*/
+.gu1{width:6px;height:6px;bottom:116px;left:102px}.pu1{width:5px;height:5px;bottom:117px;left:128px}
+.gu2{width:6px;height:6px;bottom:116px;left:152px}.pu2{width:5px;height:5px;bottom:117px;left:176px}
+/*中间蜡烛*/
+.candle{width:9px;height:52px;background:#fffef5;border-radius:4px;position:absolute;bottom:170px;left:155px}
+.flame{width:13px;height:19px;background:#ffdd33;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;position:absolute;bottom:220px;left:153px;animation:fire 0.55s infinite alternate}
+@keyframes fire{from{transform:scale(0.9)}to{transform:scale(1.15)}}
+/*顶部对称糖珠*/
+.topDot{position:absolute;border-radius:50%}
+.tg1{width:5px;height:5px;background:#ffd700;bottom:175px;left:132px}
+.tg2{width:5px;height:5px;background:#ffd700;bottom:175px;left:179px}
+.tp1{width:5px;height:5px;background:#fff;bottom:192px;left:122px}
+.tp2{width:5px;height:5px;background:#fff;bottom:192px;left:189px}
+/*底盘碎屑对称摆放*/
+.crumb{position:absolute;border-radius:50%}
+.cLight{width:9px;height:9px;background:#f8e9cc;bottom:8px}
+.cDark{width:6px;height:6px;background:#b8946c;bottom:10px}
+.cl1{left:25px}.cd1{left:42px}
+.cl2{left:295px}.cd2{left:278px}
+.cl3{left:160px}.cd3{left:180px}
 </style>
 </head>
 <body>
-<button class="btn" onclick="showPop()">🎁 神秘礼物，确定要打开吗？</button>
-<div class="pop" id="pop">
-<div class="box">
-<h1>🎉 生日快乐</h1>
-<div class="txt">愿你平安喜乐，万事顺意，岁岁常欢愉，年年皆胜意～</div>
-<button class="btn" onclick="closePop()">关闭</button>
+<div class="cakeBox" id="cakeBox">
+  <div class="cake3d">
+    <div class="cakeTit">祝王雅丽生日快乐</div>
+    <div class="plate"></div>
+    <div class="cakeLow"></div>
+    <div class="waveLow creamWave"></div>
+    <div class="cakeUp"></div>
+    <div class="waveUp creamWave"></div>
+    <!--下层镶珠-->
+    <div class="dot gold g1"></div><div class="dot pearl p1"></div>
+    <div class="dot gold g2"></div><div class="dot pearl p2"></div>
+    <div class="dot gold g3"></div><div class="dot pearl p3"></div>
+    <div class="dot gold g4"></div><div class="dot pearl p4"></div>
+    <!--上层镶珠-->
+    <div class="dot gold gu1"></div><div class="dot pearl pu1"></div>
+    <div class="dot gold gu2"></div><div class="dot pearl pu2"></div>
+    <!--中间蜡烛火苗-->
+    <div class="candle"></div>
+    <div class="flame"></div>
+    <!--顶部糖珠-->
+    <div class="topDot tg1"></div><div class="topDot tg2"></div>
+    <div class="topDot tp1"></div><div class="topDot tp2"></div>
+    <!--底盘碎屑-->
+    <div class="crumb cLight cl1"></div><div class="crumb cDark cd1"></div>
+    <div class="crumb cLight cl2"></div><div class="crumb cDark cd2"></div>
+    <div class="crumb cLight cl3"></div><div class="crumb cDark cd3"></div>
+  </div>
 </div>
+<button class="btn" id="giftBtn" onclick="openGift()">🎁神秘礼物</button>
+<div style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center" id="pop">
+  <div style="background:#fff;padding:30px;border-radius:16px;text-align:center">
+    <h2>惊喜礼物送达！</h2>
+    <button class="btn" onclick="closePop()" style="margin-top:15px">关闭</button>
+  </div>
 </div>
 <script>
-function showPop(){document.getElementById('pop').style.display='flex';}
-function closePop(){document.getElementById('pop').style.display='none';}
+function openGift(){
+  document.getElementById('pop').style.display='flex';
+  document.getElementById('cakeBox').style.display='block';
+  document.getElementById('giftBtn').style.display='none';
+}
+function closePop(){
+  document.getElementById('pop').style.display='none';
+}
 </script>
 </body>
 </html>
