@@ -6,52 +6,49 @@
 <title>生日快乐</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#fdf6f8;font-family:微软雅黑;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+body{background:#fdf6f8;font-family:微软雅黑;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
 .btn{padding:12px 26px;background:#ff5e87;color:#fff;border:0;border-radius:8px;font-size:17px;cursor:pointer}
-/*3D场景*/
 .cakeBox{width:360px;height:340px;perspective:1200px;display:none}
 .cake3d{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:cakeShow 1s ease-out}
 @keyframes cakeShow{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
 .cakeTit{position:absolute;top:-38px;width:100%;text-align:center;font-size:22px;color:#ff5e87;font-weight:bold}
-/*白圆盘底座*/
 .plate{width:330px;height:16px;background:#fff;border-radius:50%;position:absolute;bottom:10px;left:15px;box-shadow:0 4px 8px #ddd}
-/*下层蛋糕*/
-.cakeLow{width:270px;height:92px;background:#fff2d0;border-radius:14px;position:absolute;bottom:22px;left:45px;box-shadow:inset 0 -6px rgba(220,200,150,0.3)}
-/*上层蛋糕*/
-.cakeUp{width:175px;height:75px;background:#fff2d0;border-radius:12px;position:absolute;bottom:110px;left:92px;box-shadow:inset 0 -5px rgba(220,200,150,0.3)}
-/*两层波浪奶油边*/
-.creamWave{position:absolute;height:18px;background:#fff8e8;border-radius:50% 50% 0 0}
-.waveLow{width:270px;bottom:20px;left:45px;background:radial-gradient(circle at bottom,#fff8e8 55%,transparent 56%) repeat-x;background-size:32px 18px}
-.waveUp{width:175px;bottom:108px;left:92px;background:radial-gradient(circle at bottom,#fff8e8 55%,transparent 56%) repeat-x;background-size:26px 18px}
-/*金珠珍珠点缀*/
+/*香槟米色蛋糕主体*/
+.cakeLow{width:270px;height:92px;background:#f6e8d0;border-radius:14px;position:absolute;bottom:22px;left:45px;box-shadow:inset 0 -6px #e9d9bc}
+.cakeUp{width:175px;height:75px;background:#f6e8d0;border-radius:12px;position:absolute;bottom:110px;left:92px;box-shadow:inset 0 -5px #e9d9bc}
+.creamWave{position:absolute;height:18px;background:#fff8ef;border-radius:50% 50% 0 0}
+.waveLow{width:270px;bottom:20px;left:45px;background:radial-gradient(circle at bottom,#fff8ef 55%,transparent 56%) repeat-x;background-size:32px 18px}
+.waveUp{width:175px;bottom:108px;left:92px;background:radial-gradient(circle at bottom,#fff8ef 55%,transparent 56%) repeat-x;background-size:26px 18px}
 .dot{border-radius:50%;position:absolute}
-.gold{background:#ffd700;box-shadow:0 0 4px #ffd700}
-.pearl{background:#fff;box-shadow:0 0 3px #e9e9e9}
-/*下层对称珠子*/
+.gold{background:#ffd700;box-shadow:0 0 3px #ffd700}
+.pearl{background:#fff;box-shadow:0 0 2px #eee}
+/*下层成对裱花金珠 左右对称*/
 .g1{width:7px;height:7px;bottom:28px;left:52px}.p1{width:6px;height:6px;bottom:29px;left:78px}
 .g2{width:7px;height:7px;bottom:28px;left:110px}.p2{width:6px;height:6px;bottom:29px;left:135px}
 .g3{width:7px;height:7px;bottom:28px;left:162px}.p3{width:6px;height:6px;bottom:29px;left:190px}
 .g4{width:7px;height:7px;bottom:28px;left:222px}.p4{width:6px;height:6px;bottom:29px;left:246px}
-/*上层对称珠子*/
+/*上层成对装饰对称*/
 .gu1{width:6px;height:6px;bottom:116px;left:102px}.pu1{width:5px;height:5px;bottom:117px;left:128px}
 .gu2{width:6px;height:6px;bottom:116px;left:152px}.pu2{width:5px;height:5px;bottom:117px;left:176px}
-/*中间蜡烛*/
-.candle{width:9px;height:52px;background:#fffef5;border-radius:4px;position:absolute;bottom:170px;left:155px}
+/*中间白色蜡烛+跳动火苗*/
+.candle{width:9px;height:52px;background:#ffffff;border-radius:4px;position:absolute;bottom:170px;left:155px}
 .flame{width:13px;height:19px;background:#ffdd33;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;position:absolute;bottom:220px;left:153px;animation:fire 0.55s infinite alternate}
 @keyframes fire{from{transform:scale(0.9)}to{transform:scale(1.15)}}
-/*顶部对称糖珠*/
+/*蜡烛左右顶面：金珠+珍珠对称*/
 .topDot{position:absolute;border-radius:50%}
-.tg1{width:5px;height:5px;background:#ffd700;bottom:175px;left:132px}
-.tg2{width:5px;height:5px;background:#ffd700;bottom:175px;left:179px}
-.tp1{width:5px;height:5px;background:#fff;bottom:192px;left:122px}
-.tp2{width:5px;height:5px;background:#fff;bottom:192px;left:189px}
-/*底盘碎屑对称摆放*/
+.tgL{width:5px;height:5px;background:#ffd700;bottom:176px;left:130px}
+.tpL{width:5px;height:5px;background:#fff;bottom:190px;left:120px}
+.tgR{width:5px;height:5px;background:#ffd700;bottom:176px;left:180px}
+.tpR{width:5px;height:5px;background:#fff;bottom:190px;left:190px}
+/*底盘碎屑严格左右对称*/
 .crumb{position:absolute;border-radius:50%}
 .cLight{width:9px;height:9px;background:#f8e9cc;bottom:8px}
 .cDark{width:6px;height:6px;background:#b8946c;bottom:10px}
 .cl1{left:25px}.cd1{left:42px}
 .cl2{left:295px}.cd2{left:278px}
 .cl3{left:160px}.cd3{left:180px}
+/*礼花*/
+.firework{position:fixed;bottom:0;width:8px;height:8px;border-radius:50%;z-index:99}
 </style>
 </head>
 <body>
@@ -63,21 +60,21 @@ body{background:#fdf6f8;font-family:微软雅黑;height:100vh;display:flex;flex-
     <div class="waveLow creamWave"></div>
     <div class="cakeUp"></div>
     <div class="waveUp creamWave"></div>
-    <!--下层镶珠-->
+    <!--下层成对装饰-->
     <div class="dot gold g1"></div><div class="dot pearl p1"></div>
     <div class="dot gold g2"></div><div class="dot pearl p2"></div>
     <div class="dot gold g3"></div><div class="dot pearl p3"></div>
     <div class="dot gold g4"></div><div class="dot pearl p4"></div>
-    <!--上层镶珠-->
+    <!--上层成对装饰-->
     <div class="dot gold gu1"></div><div class="dot pearl pu1"></div>
     <div class="dot gold gu2"></div><div class="dot pearl pu2"></div>
-    <!--中间蜡烛火苗-->
+    <!--中间蜡烛-->
     <div class="candle"></div>
     <div class="flame"></div>
-    <!--顶部糖珠-->
-    <div class="topDot tg1"></div><div class="topDot tg2"></div>
-    <div class="topDot tp1"></div><div class="topDot tp2"></div>
-    <!--底盘碎屑-->
+    <!--蜡烛左右糖珠珍珠-->
+    <div class="topDot tgL"></div><div class="topDot tpL"></div>
+    <div class="topDot tgR"></div><div class="topDot tpR"></div>
+    <!--底部对称碎屑-->
     <div class="crumb cLight cl1"></div><div class="crumb cDark cd1"></div>
     <div class="crumb cLight cl2"></div><div class="crumb cDark cd2"></div>
     <div class="crumb cLight cl3"></div><div class="crumb cDark cd3"></div>
@@ -91,10 +88,28 @@ body{background:#fdf6f8;font-family:微软雅黑;height:100vh;display:flex;flex-
   </div>
 </div>
 <script>
+function startFire(){
+    const colorArr=['#ff3333','#ffdd00','#33ee55','#33ccff','#ff77dd'];
+    for(let i=0;i<80;i++){
+        let dom=document.createElement('div');
+        dom.className='firework';
+        dom.style.left=Math.random()*100+'vw';
+        dom.style.background=colorArr[Math.floor(Math.random()*colorArr.length)];
+        document.body.appendChild(dom);
+        let tx=(Math.random()-0.5)*400;
+        let ty=-Math.random()*600-200;
+        dom.animate([
+            {transform:'translate(0,0)',opacity:1},
+            {transform:`translate(${tx}px,${ty}px)`,opacity:0}
+        ],{duration:1200,easing:'ease-out'});
+        setTimeout(()=>dom.remove(),1200);
+    }
+}
 function openGift(){
   document.getElementById('pop').style.display='flex';
   document.getElementById('cakeBox').style.display='block';
   document.getElementById('giftBtn').style.display='none';
+  startFire();
 }
 function closePop(){
   document.getElementById('pop').style.display='none';
