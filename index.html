@@ -6,14 +6,30 @@
 <title>生日快乐</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#fdf6f8;font-family:微软雅黑;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+/*柔光渐变背景*/
+body{
+background:#fdf6f8;font-family:微软雅黑;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;
+animation:bgChange 8s infinite alternate;
+}
+@keyframes bgChange{
+0%{background:#fdf6f8}
+50%{background:#fff0f6}
+100%{background:#fff5ee}
+}
 .btn{padding:12px 26px;background:#ff5e87;color:#fff;border:0;border-radius:8px;font-size:17px;cursor:pointer}
 .cakeBox{width:360px;height:340px;perspective:1200px;display:none}
 .cake3d{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:cakeShow 1s ease-out}
 @keyframes cakeShow{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
-.cakeTit{position:absolute;top:-38px;width:100%;text-align:center;font-size:22px;color:#ff5e87;font-weight:bold}
+/*发光标题*/
+.cakeTit{
+position:absolute;top:-38px;width:100%;text-align:center;font-size:22px;color:#ff5e87;font-weight:bold;
+animation:textLight 2.5s infinite alternate;
+}
+@keyframes textLight{
+0%{text-shadow:0 0 6px #ff88aa,0 0 10px #ffc0cb;}
+100%{text-shadow:0 0 12px #ff6699,0 0 20px #ffb6c1;}
+}
 .plate{width:330px;height:16px;background:#fff;border-radius:50%;position:absolute;bottom:10px;left:15px;box-shadow:0 4px 8px #ddd}
-/*香槟米色蛋糕主体*/
 .cakeLow{width:270px;height:92px;background:#f6e8d0;border-radius:14px;position:absolute;bottom:22px;left:45px;box-shadow:inset 0 -6px #e9d9bc}
 .cakeUp{width:175px;height:75px;background:#f6e8d0;border-radius:12px;position:absolute;bottom:110px;left:92px;box-shadow:inset 0 -5px #e9d9bc}
 .creamWave{position:absolute;height:18px;background:#fff8ef;border-radius:50% 50% 0 0}
@@ -22,36 +38,55 @@ body{background:#fdf6f8;font-family:微软雅黑;height:100vh;display:flex;flex-
 .dot{border-radius:50%;position:absolute}
 .gold{background:#ffd700;box-shadow:0 0 3px #ffd700}
 .pearl{background:#fff;box-shadow:0 0 2px #eee}
-/*下层成对裱花金珠 左右对称*/
 .g1{width:7px;height:7px;bottom:28px;left:52px}.p1{width:6px;height:6px;bottom:29px;left:78px}
 .g2{width:7px;height:7px;bottom:28px;left:110px}.p2{width:6px;height:6px;bottom:29px;left:135px}
 .g3{width:7px;height:7px;bottom:28px;left:162px}.p3{width:6px;height:6px;bottom:29px;left:190px}
 .g4{width:7px;height:7px;bottom:28px;left:222px}.p4{width:6px;height:6px;bottom:29px;left:246px}
-/*上层成对装饰对称*/
 .gu1{width:6px;height:6px;bottom:116px;left:102px}.pu1{width:5px;height:5px;bottom:117px;left:128px}
 .gu2{width:6px;height:6px;bottom:116px;left:152px}.pu2{width:5px;height:5px;bottom:117px;left:176px}
-/*中间白色蜡烛+跳动火苗*/
 .candle{width:9px;height:52px;background:#ffffff;border-radius:4px;position:absolute;bottom:170px;left:155px}
-.flame{width:13px;height:19px;background:#ffdd33;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;position:absolute;bottom:220px;left:153px;animation:fire 0.55s infinite alternate}
+/*火苗+烛光光晕*/
+.flame{
+width:13px;height:19px;background:#ffdd33;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+position:absolute;bottom:220px;left:153px;animation:fire 0.55s infinite alternate;
+box-shadow:0 0 15px #ffdd33,0 0 30px #ffbb22;
+}
 @keyframes fire{from{transform:scale(0.9)}to{transform:scale(1.15)}}
-/*蜡烛左右顶面：金珠+珍珠对称*/
 .topDot{position:absolute;border-radius:50%}
 .tgL{width:5px;height:5px;background:#ffd700;bottom:176px;left:130px}
 .tpL{width:5px;height:5px;background:#fff;bottom:190px;left:120px}
 .tgR{width:5px;height:5px;background:#ffd700;bottom:176px;left:180px}
 .tpR{width:5px;height:5px;background:#fff;bottom:190px;left:190px}
-/*底盘碎屑严格左右对称*/
 .crumb{position:absolute;border-radius:50%}
 .cLight{width:9px;height:9px;background:#f8e9cc;bottom:8px}
 .cDark{width:6px;height:6px;background:#b8946c;bottom:10px}
 .cl1{left:25px}.cd1{left:42px}
 .cl2{left:295px}.cd2{left:278px}
 .cl3{left:160px}.cd3{left:180px}
-/*礼花*/
 .firework{position:fixed;bottom:0;width:8px;height:8px;border-radius:50%;z-index:99}
+/*闪烁星光*/
+.star{
+position:fixed;background:#fff;border-radius:50%;opacity:0.7;
+animation:twinkle 2.2s infinite alternate;
+}
+@keyframes twinkle{0%{opacity:0.2}100%{opacity:1}}
 </style>
 </head>
 <body>
+<!--自动生成全屏星光-->
+<script>
+//生成闪烁星星
+for(let s=0;s<35;s++){
+  let star=document.createElement('div');
+  star.className='star';
+  let sz=Math.random()*3+1;
+  star.style.width=star.style.height=sz+'px';
+  star.style.left=Math.random()*100+'vw';
+  star.style.top=Math.random()*100+'vh';
+  star.style.animationDelay=Math.random()*2+'s';
+  document.body.append(star);
+}
+</script>
 <div class="cakeBox" id="cakeBox">
   <div class="cake3d">
     <div class="cakeTit">祝王雅丽生日快乐</div>
@@ -60,21 +95,16 @@ body{background:#fdf6f8;font-family:微软雅黑;height:100vh;display:flex;flex-
     <div class="waveLow creamWave"></div>
     <div class="cakeUp"></div>
     <div class="waveUp creamWave"></div>
-    <!--下层成对装饰-->
     <div class="dot gold g1"></div><div class="dot pearl p1"></div>
     <div class="dot gold g2"></div><div class="dot pearl p2"></div>
     <div class="dot gold g3"></div><div class="dot pearl p3"></div>
     <div class="dot gold g4"></div><div class="dot pearl p4"></div>
-    <!--上层成对装饰-->
     <div class="dot gold gu1"></div><div class="dot pearl pu1"></div>
     <div class="dot gold gu2"></div><div class="dot pearl pu2"></div>
-    <!--中间蜡烛-->
     <div class="candle"></div>
     <div class="flame"></div>
-    <!--蜡烛左右糖珠珍珠-->
     <div class="topDot tgL"></div><div class="topDot tpL"></div>
     <div class="topDot tgR"></div><div class="topDot tpR"></div>
-    <!--底部对称碎屑-->
     <div class="crumb cLight cl1"></div><div class="crumb cDark cd1"></div>
     <div class="crumb cLight cl2"></div><div class="crumb cDark cd2"></div>
     <div class="crumb cLight cl3"></div><div class="crumb cDark cd3"></div>
