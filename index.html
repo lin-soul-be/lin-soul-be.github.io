@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>生日快乐</title>
+<style>
+body{margin:0;padding:0;background:#fdf6f8;font-family:微软雅黑,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;}
+.pop{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:999;}
+.box{background:#fff;padding:30px;border-radius:16px;text-align:center;max-width:320px;width:80%;}
+h1{color:#ff5e87;margin:0 0 10px;}
+.txt{color:#666;font-size:16px;line-height:1.6;}
+.btn{padding:12px 24px;background:#ff5e87;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;}
+</style>
+</head>
+<body>
+<button class="btn" onclick="showPop()">🎁 神秘礼物，确定要打开吗？</button>
+<div class="pop" id="pop">
+<div class="box">
+<h1>🎉 生日快乐</h1>
+<div class="txt">愿你平安喜乐，万事顺意，岁岁常欢愉，年年皆胜意～</div>
+<button class="btn" onclick="closePop()">关闭</button>
+</div>
+</div>
+<script>
+function showPop(){document.getElementById('pop').style.display='flex';}
+function closePop(){document.getElementById('pop').style.display='none';}
+</script>
+</body>
+</html>
