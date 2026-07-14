@@ -135,7 +135,9 @@
             flameGather: 0,
             textAnimT: 0,
             targetTextAnimT: 0,
-            time: 0
+            time: 0,
+            audio:null,
+            firstPlay:false
         };
 
         let scene, camera, renderer, composer;
@@ -643,7 +645,35 @@
             window.addEventListener('resize', resizeHandler, { passive: true });
 
             // 按钮切换阶段
-            document.getElementById('toggle-btn').addEventListener('click', () => {
+            document.getElementById('toggle-btn').addEventListener('click', async () => {
+    // 只第一次点击播放背景音乐
+    if (!STATE.firstPlay) {
+        try {
+            STATE.audio = new Audio("bgm.mp3");
+            STATE.audio.volume = 0.35;
+            STATE.audio.loop = true;
+            await STATE.audio.play();
+            STATE.firstPlay = true;
+        } catch (err) {
+            console.log("音乐加载失败：", err);
+        }
+    }
+
+    // 原有蛋糕切换逻辑保留
+    STATE.stage = (STATE.stage + 1) % 3;
+    const btn = document.getElementById('toggle-btn');
+    if(STATE.stage === 0){
+        btn.textContent = '点击一下';
+        STATE.targetTextAnimT = 0;
+    }else if(STATE.stage === 1){
+        btn.textContent = '生日快乐';
+        STATE.targetTextAnimT = 1;
+    }else{
+        btn.textContent = '心想事成';
+        STATE.targetTextAnimT = 2;
+    }
+});
+            /*document.getElementById('toggle-btn').addEventListener('click', () => {
                 STATE.stage = (STATE.stage + 1) % 3;
                 const btn = document.getElementById('toggle-btn');
                 if(STATE.stage === 0){
@@ -656,7 +686,7 @@
                     btn.textContent = '心想事成';
                     STATE.targetTextAnimT = 2;
                 }
-            });
+            });*/
             animate();
         }
 
