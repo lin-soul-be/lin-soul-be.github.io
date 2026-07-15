@@ -81,7 +81,6 @@
         <h1>生日蛋糕</h1>
         <button id="toggle-btn" class="btn">点击一下</button>
     </div>
-    <audio id="bgmAudio" src="bgm.mp3">
 
     <script type="importmap">
         {
@@ -97,21 +96,8 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        
-// 粘贴这段音频控制代码
-const audio = document.getElementById('bgmAudio');
-let played = false;
 
-audio.onended = () => {
-  audio.currentTime = 0;
-};
-
-document.getElementById('toggle-btn').addEventListener('click', () => {
-  if (played) return;
-  audio.play();
-  played = true;
-});
-
+        // ===================== 全局常量配置（抽离统一管理） =====================
         const CONFIG = Object.freeze({
             particle: {
                 foliage: 28000,
@@ -138,29 +124,29 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             },
             scatterRadius: 42,
             textHeight: 17,
-            textDistance: 68,
             bloom: { threshold: 0.35, strength: 0.6, radius: 0.4 },
             camera: { fov: 45, distance: 70, rotateSpeed: 0.09 },
             animSpeed: { transLerp: 0.022, flameLerp: 0.018, textLerp: 0.028 }
         });
 
+        // ===================== 状态对象（扁平化，减少层级访问开销） =====================
         const STATE = {
             stage: 0,
             transition: 0,
             flameGather: 0,
             textAnimT: 0,
             targetTextAnimT: 0,
-            time: 0,
-            audio:null,
-            firstPlay:false
+            time: 0
         };
 
+        // ===================== 全局渲染实例缓存 =====================
         let scene, camera, renderer, composer;
         let foliageSystem, creamSystem, ornamentSystem, flameSystem, textPoints;
         const clock = new THREE.Clock();
         const textCanvas = document.getElementById('textCanvas');
         const textCtx = textCanvas.getContext('2d');
 
+        // 复用数学工具对象（避免高频 new 内存碎片）
         const UTIL = {
             dummyObj: new THREE.Object3D(),
             tempVec3: new THREE.Vector3(),
@@ -179,7 +165,9 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             }
         };
 
+        // ===================== 着色器统一抽离（删除重复 cubic 函数） =====================
         const SHADER = {
+            // 文字粒子
             textVertex: `
                 uniform float uTime;
                 uniform float uAnimT;
@@ -198,17 +186,12 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
 
                 void main(){
                     vColor = aColor;
-
                     float t0 = smoothCubic(clamp(uAnimT, 0.0, 1.0));
                     float t1 = smoothCubic(clamp(uAnimT - 1.0, 0.0, 1.0));
-
                     vec3 pos = mix(aScatterPos, mix(aNameTarget, aBirthTarget, t1), t0);
-
-                    pos += sin(uTime * 1.2 + aRand * 12.0) * 0.035 * vec3(1.0, 1.0, 0.3);
-
+                    pos += sin(uTime * 1.2 + aRand * 12.0) * 0.035 * vec3(1,0,0.3);
                     float alpha = smoothstep(0.0, 0.15, uAnimT) * (1.0 - smoothstep(1.85, 2.0, uAnimT));
                     vOpacity = alpha;
-
                     vec4 mv = modelViewMatrix * vec4(pos, 1.0);
                     gl_Position = projectionMatrix * mv;
                     gl_PointSize = aSize * (300.0 / -mv.z);
@@ -224,6 +207,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
                     gl_FragColor = vec4(vColor, pow(1.0 - d*2.0, 1.5) * vOpacity);
                 }
             `,
+            // 蛋糕奶油粒子通用着色器
             foliageVertex: `
                 uniform float uTime;
                 uniform float uTransition;
@@ -258,6 +242,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
                     gl_FragColor = vec4(vColor, pow(1.0 - d*2.0, 1.6) * 0.85);
                 }
             `,
+            // 火焰粒子
             flameVertex: `
                 uniform float uTime;
                 uniform float uFlameGather;
@@ -297,7 +282,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             `
         };
 
-        // 文字点阵生成
+        // ===================== 工具函数：文字点阵生成 =====================
         function getTextPoints(text, yOffset = 0) {
             textCtx.clearRect(0,0,textCanvas.width,textCanvas.height);
             textCtx.fillStyle = '#fff';
@@ -316,7 +301,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
                         list.push(new THREE.Vector3(
                             (x - textCanvas.width/2) * scale,
                             baseY - y * scale,
-                            -6
+                            0
                         ));
                     }
                 }
@@ -324,7 +309,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             return list;
         }
 
-        // 创建文字粒子
+        // ===================== 创建文字粒子 =====================
         function createTextMesh() {
             const namePoints = getTextPoints("王雅丽", -35);
             const birthPoints = getTextPoints("生日快乐", 40);
@@ -335,9 +320,9 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
                 const [sx,sy,sz] = UTIL.randomSphere(CONFIG.scatterRadius * 1.3);
                 scatter.push(sx,sy,sz);
                 const p1 = namePoints[i % namePoints.length];
-                t1.push(p1.x, p1.y, p1.z);
+                t1.push(p1.x, p1.y, p1.z - 6);
                 const p2 = birthPoints[i % birthPoints.length];
-                t2.push(p2.x, p2.y, p2.z);
+                t2.push(p2.x, p2.y, p2.z - 6);
                 rand.push(Math.random());
                 size.push(Math.random() * 0.3 + 0.2);
                 color.push(CONFIG.colors.text.r, CONFIG.colors.text.g, CONFIG.colors.text.b);
@@ -359,7 +344,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             scene.add(textPoints);
         }
 
-        // 底层蛋糕粒子
+        // ===================== 底层蛋糕粒子 =====================
         function createFoliageParticles() {
             const geo = new THREE.BufferGeometry();
             const scatterPos = [], cakePos = [], randoms = [], sizes = [], colors = [];
@@ -407,7 +392,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             scene.add(foliageSystem);
         }
 
-        // 顶层奶油粒子
+        // ===================== 顶层奶油粒子 =====================
         function createCreamParticles() {
             const geo = new THREE.BufferGeometry();
             const scatterPos = [], cakePos = [], randoms = [], sizes = [], colors = [];
@@ -443,7 +428,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             scene.add(creamSystem);
         }
 
-        // 装饰金球+蜡烛
+        // ===================== 装饰金球+蜡烛 =====================
         function createOrnaments() {
             const candleGeo = new THREE.CylinderGeometry(0.22, 0.22, 1.6, 16);
             const candleMat = new THREE.MeshStandardMaterial({
@@ -495,7 +480,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             scene.add(ornamentSystem);
         }
 
-        // 火焰粒子
+        // ===================== 火焰粒子 =====================
         function createFlameParticles() {
             const geo = new THREE.BufferGeometry();
             const scatterPos = [], candlePos = [], randoms = [], sizes = [], colors = [];
@@ -535,7 +520,7 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             scene.add(flameSystem);
         }
 
-        // 窗口自适应
+        // ===================== 窗口自适应 =====================
         function resizeHandler() {
             const w = window.innerWidth;
             const h = window.innerHeight;
@@ -545,26 +530,27 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             composer.setSize(w, h);
         }
 
-        // 主渲染循环
+        // ===================== 主渲染循环（大幅精简循环内计算） =====================
         function animate() {
             requestAnimationFrame(animate);
             const dt = clock.getDelta();
             STATE.time += dt;
             const t = STATE.time;
 
+            // 统一更新粒子着色器时间
             const foliageMat = foliageSystem.material;
             foliageMat.uniforms.uTime.value = t;
             foliageMat.uniforms.uTransition.value = STATE.transition;
-            foliageSystem.rotation.y = t * CONFIG.camera.rotateSpeed;
+            foliageSystem.rotation.y = t * 0.045;
 
             const creamMat = creamSystem.material;
             creamMat.uniforms.uTime.value = t;
             creamMat.uniforms.uTransition.value = STATE.transition;
-            creamSystem.rotation.y = t * CONFIG.camera.rotateSpeed;
+            creamSystem.rotation.y = t * 0.045;
 
-            ornamentSystem.rotation.y = t * CONFIG.camera.rotateSpeed;
+            ornamentSystem.rotation.y = t * 0.045;
 
-            // 更新装饰小球动画
+            // 批量更新实例矩阵
             const dummy = UTIL.dummyObj;
             const transT = UTIL.smoothCubic(STATE.transition);
             const ornamentData = ornamentSystem.userData;
@@ -581,9 +567,8 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
 
             textPoints.material.uniforms.uTime.value = t;
             textPoints.material.uniforms.uAnimT.value = STATE.textAnimT;
-            textPoints.lookAt(camera.position);
 
-            // 阶段切换插值
+            // 阶段状态插值（统一 lerp 逻辑）
             const speed = CONFIG.animSpeed;
             switch(STATE.stage){
                 case 0:
@@ -618,20 +603,21 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             composer.render();
         }
 
-        // 初始化
+        // ===================== 初始化入口 =====================
         function init() {
             scene = new THREE.Scene();
             scene.fog = new THREE.FogExp2(0x020202, 0.018);
+            // 相机
             camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, window.innerWidth / window.innerHeight, 1, 1000);
             camera.position.set(0, 8, CONFIG.camera.distance);
+            // 渲染器优化
             renderer = new THREE.WebGLRenderer({ antialias: false });
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // 降低高分屏性能消耗
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
             renderer.toneMappingExposure = 0.6;
             document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-            // 灯光
+            // 灯光轻量化
             const ambient = new THREE.AmbientLight(0xffffff, 0.28);
             scene.add(ambient);
             const spot1 = new THREE.SpotLight(0xffddbb, 110);
@@ -640,55 +626,23 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
             scene.add(spot1);
             scene.add(new THREE.SpotLight(0xffffff, 45, 0, 0, 0, 0).position.set(-18,8,18));
             scene.add(new THREE.PointLight(0xffccaa, 18, 100).position.set(0,18,-18));
-
-            // 后期泛光
+            // 后期 bloom 轻量化
             const renderPass = new RenderPass(scene, camera);
             const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), CONFIG.bloom.strength, CONFIG.bloom.radius, CONFIG.bloom.threshold);
             composer = new EffectComposer(renderer);
             composer.addPass(renderPass);
             composer.addPass(bloom);
-
-            // 创建粒子系统
+            // 按渲染权重顺序创建粒子
             createFoliageParticles();
             createCreamParticles();
             createOrnaments();
             createFlameParticles();
             createTextMesh();
-
-            // 隐藏加载文字
+            // 隐藏加载
             document.getElementById('loading').style.display = 'none';
+            // 事件监听
             window.addEventListener('resize', resizeHandler, { passive: true });
-
-            // 按钮切换阶段
-            document.getElementById('toggle-btn').addEventListener('click', async () => {
-    // 只第一次点击播放背景音乐
-    if (!STATE.firstPlay) {
-        try {
-            STATE.audio = new Audio("bgm.mp3");
-            STATE.audio.volume = 0.35;
-            STATE.audio.loop = true;
-            await STATE.audio.play();
-            STATE.firstPlay = true;
-        } catch (err) {
-            console.log("音乐加载失败：", err);
-        }
-    }
-
-    // 原有蛋糕切换逻辑保留
-    STATE.stage = (STATE.stage + 1) % 3;
-    const btn = document.getElementById('toggle-btn');
-    if(STATE.stage === 0){
-        btn.textContent = '点击一下';
-        STATE.targetTextAnimT = 0;
-    }else if(STATE.stage === 1){
-        btn.textContent = '生日快乐';
-        STATE.targetTextAnimT = 1;
-    }else{
-        btn.textContent = '心想事成';
-        STATE.targetTextAnimT = 2;
-    }
-});
-            /*document.getElementById('toggle-btn').addEventListener('click', () => {
+            document.getElementById('toggle-btn').addEventListener('click', () => {
                 STATE.stage = (STATE.stage + 1) % 3;
                 const btn = document.getElementById('toggle-btn');
                 if(STATE.stage === 0){
@@ -701,10 +655,11 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
                     btn.textContent = '心想事成';
                     STATE.targetTextAnimT = 2;
                 }
-            });*/
+            });
             animate();
         }
 
+        // 启动
         init();
     </script>
 </body>
